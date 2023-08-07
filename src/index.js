@@ -1,31 +1,23 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
-const pool = require("./db");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const testRoutes = require("./routes/test.routes");
+const usuarioRoutes = require("./routes/usuario.routes");
+
 const PORT = process.env.PORT ?? 8000;
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
-// Definir una ruta de prueba
-app.get("/", (req, res) => {
-  res.send("¡Hola Mundo!");
-});
+// habilitar conexion entre servicios webs con puertos distintos
+app.use(cors());
 
-// connection test
-app.get("/ping", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    return res.json(result.rows[0]);
-  } catch (err) {
-    console.log(err);
-    console.log(err.detail);
-  }
-});
+// llamar rutas
+app.use(testRoutes);
+app.use(usuarioRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, () => {
