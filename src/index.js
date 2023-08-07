@@ -1,10 +1,13 @@
-import express, { json } from "express";
-import pg from "pg";
-import { config } from "dotenv";
-
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-
+const PORT = process.env.PORT ?? 8000;
+const express = require("express");
+const { v4: uuidv4 } = require("uuid");
 const app = express();
+const pool = require("./db");
+const cors = require("cors");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+console.log(pool);
 
 // Definir un puerto para nuestro servidor
 const port = 3000 || process.env.PORT;
