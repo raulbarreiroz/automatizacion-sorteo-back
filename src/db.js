@@ -6,9 +6,6 @@ const config = {
   ssl: true,
 };
 
-console.log("config:");
-console.log(config);
-
 const pool = new pg.Pool(config);
 
 module.exports = pool;
