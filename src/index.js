@@ -7,7 +7,8 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-console.log(pool);
+app.use(cors());
+app.use(express.json());
 
 // Definir un puerto para nuestro servidor
 const port = 3000 || process.env.PORT;
@@ -18,8 +19,15 @@ app.get("/", (req, res) => {
 });
 
 app.get("/ping", async (req, res) => {
-  const result = await pool.query("SELECT NOW()");
-  return res.json(result.rows[0]);
+  try {
+    console.log("pinging");
+    console.log(result.rows[0]);
+    const result = await pool.query("SELECT NOW()");
+    return res.json(result.rows[0]);
+  } catch (err) {
+    console.log(err);
+    console.log(err.detail);
+  }
 });
 
 // Iniciar el servidor

@@ -1,19 +1,18 @@
 const pg = require("pg");
 require("dotenv").config();
 
-/*
-const pool = new Pool({
+const deploy = true;
 
-  user: process.env.USUARIO,
-  password: process.env.PASSWORD,
-  host: process.env.HOST,
-  database: process.env.DBNAME,
-  
-  port: process.env.DBPORT,
-  connectionString: process?.env?.DATABASE_URL,
-});
-*/
+const config = {
+  connectionString: deploy
+    ? process.env.EXTERNAL_DATABASE_URL
+    : process.env.INTERNAL_DATABASE_URL,
+};
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+if (deploy) {
+  config["ssl"] = true;
+}
+
+const pool = new pg.Pool(config);
 
 module.exports = pool;
