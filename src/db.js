@@ -1,15 +1,13 @@
 const pg = require("pg");
 require("dotenv").config();
 
-const deploy = true;
-
 const config = {
   connectionString: process.env.DATABASE_URL,
+  ssl: true,
 };
 
-if (!deploy) {
-  config["ssl"] = true;
-}
+console.log("config:");
+console.log(config);
 
 const pool = new pg.Pool(config);
 
