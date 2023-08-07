@@ -30,6 +30,6 @@ app.get("/ping", async (req, res) => {
 // Iniciar el servidor
 app.listen(PORT, () => {
   console.log(
-    `Servidor de automatizacion de sorteo iniciado en http://localhost:${port}`
+    `Servidor de automatizacion de sorteo iniciado en http://localhost:${PORT}`
   );
 });
