@@ -1,7 +1,7 @@
 const pool = require("../db");
 
 // get de todos los catalogos con sus detalles
-const getCatalogos = async (req, res) => {
+const getCatalogos = async (req, res, next) => {
   try {
     const catalogo = await pool.query(`select 
 cabecera.*,
@@ -27,13 +27,12 @@ from catalogo_cabecera cabecera
 WHERE cabecera.estado='A'`);
     return res.json(catalogo.rows);
   } catch (err) {
-    console.log(err);
-    console.log(err.detail);
+    next(err);
   }
 };
 
 // create catalogo_cabecera
-const createCatalogoCabecera = async (req, res) => {
+const createCatalogoCabecera = async (req, res, next) => {
   const { nombre, descripcion, creado_por } = req.body;
 
   try {
@@ -45,12 +44,12 @@ const createCatalogoCabecera = async (req, res) => {
     );
     res.json(catalogoCabecera);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
 // create catalogo_detalle
-const createCatalogoDetalle = async (req, res) => {
+const createCatalogoDetalle = async (req, res, next) => {
   const { nombre, descripcion, creado_por, cabecera } = req.body;
 
   try {
@@ -62,12 +61,12 @@ const createCatalogoDetalle = async (req, res) => {
     );
     res.json(catalogoDetalle);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
 // update catalogo_cabecera
-const updateCatalogoCabecera = async (req, res) => {
+const updateCatalogoCabecera = async (req, res, next) => {
   const { id } = req.params;
   const { nombre, descripcion, modificado_por } = req.body;
 
@@ -90,14 +89,14 @@ const updateCatalogoCabecera = async (req, res) => {
 
     res.json(catalogoCabeceraEditado);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
 // update catalogo_detalle
-const updateCatalogoDetalle = async (req, res) => {
-  const { params } = req.params;
-  const { nombre, descripcion, modificado_por } = req.body;
+const updateCatalogoDetalle = async (req, res, next) => {
+  const { id } = req.params;
+  const { nombre, descripcion, modificado_por, estado } = req.body;
   console.log("id: ");
   console.log(id);
 
@@ -122,11 +121,11 @@ const updateCatalogoDetalle = async (req, res) => {
 
     res.json(catalogoDetalleEditado);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-const deleteCatalogoCabecera = async (req, res) => {
+const deleteCatalogoCabecera = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -141,11 +140,11 @@ const deleteCatalogoCabecera = async (req, res) => {
 
     res.json(catalogoCabeceraEliminado);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-const deleteCatalogoDetalle = async (req, res) => {
+const deleteCatalogoDetalle = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -160,7 +159,7 @@ const deleteCatalogoDetalle = async (req, res) => {
 
     res.json(catalogoDetalleEliminado);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 

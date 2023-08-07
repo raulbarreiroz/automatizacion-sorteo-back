@@ -2,20 +2,19 @@ const pool = require("../db");
 const bcrypt = require("bcrypt");
 
 // get de todos los usuarios
-const getUsuarios = async (req, res) => {
+const getUsuarios = async (req, res, next) => {
   try {
     const result = await pool.query(
       "SELECT * FROM usuario WHERE estado in ('A')"
     );
     return res.json(result.rows);
   } catch (err) {
-    console.log(err);
-    console.log(err.detail);
+    next(err);
   }
 };
 
 // create usuario
-const createUsuario = async (req, res) => {
+const createUsuario = async (req, res, next) => {
   try {
     const { email, pwd, alias, cabecera_id, detalle_id, creado_por } = req.body;
 
@@ -52,12 +51,12 @@ const createUsuario = async (req, res) => {
       console.log(err);
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
 // update catalogo_cabecera
-const updateUsuario = async (req, res) => {
+const updateUsuario = async (req, res, next) => {
   const { id } = req.params;
   const {
     email,
@@ -93,11 +92,11 @@ const updateUsuario = async (req, res) => {
 
     res.json(usuarioEditado);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-const deleteUsuario = async (req, res) => {
+const deleteUsuario = async (req, res, next) => {
   try {
     console.log("deleting");
 
@@ -118,7 +117,7 @@ const deleteUsuario = async (req, res) => {
       console.log(err);
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 

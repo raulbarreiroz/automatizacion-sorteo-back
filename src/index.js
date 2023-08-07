@@ -21,6 +21,12 @@ app.use(testRoutes);
 app.use(usuarioRoutes);
 app.use(catalogoRoutes);
 
+app.use((err, req, res, next) => {
+  return res.json({
+    message: err.message,
+  });
+});
+
 // Iniciar el servidor
 app.listen(PORT, () => {
   console.log(
