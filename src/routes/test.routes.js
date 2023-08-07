@@ -1,22 +1,12 @@
 const { Router } = require("express");
-const pool = require("../db");
+const { getTest, getPing } = require("../controllers/test.controller");
 
 const router = Router();
 
 // Definir una ruta de prueba
-router.get("/jellou_moto", (req, res) => {
-  res.send("jellou moto");
-});
+router.get("/jellou_moto", getTest);
 
 // connection test
-router.get("/ping", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    return res.json(result.rows[0]);
-  } catch (err) {
-    console.log(err);
-    console.log(err.detail);
-  }
-});
+router.get("/ping", getPing);
 
 module.exports = router;

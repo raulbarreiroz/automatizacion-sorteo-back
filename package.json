@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "startDev": "nodemon src/index.js", 
+    "startDev": "nodemon src/index.js",
     "start": "node src/index.js",
     "deploy": "node src/index.js",
     "build": "react-scripts build",

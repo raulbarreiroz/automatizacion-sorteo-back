@@ -1,11 +1,12 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 const cors = require("cors");
-const bcrypt = require("bcrypt");
+
 const jwt = require("jsonwebtoken");
 
 const testRoutes = require("./routes/test.routes");
 const usuarioRoutes = require("./routes/usuario.routes");
+const catalogoRoutes = require("./routes/catalogo.routes");
 
 const PORT = process.env.PORT ?? 8000;
 const app = express();
@@ -18,6 +19,7 @@ app.use(cors());
 // llamar rutas
 app.use(testRoutes);
 app.use(usuarioRoutes);
+app.use(catalogoRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, () => {
