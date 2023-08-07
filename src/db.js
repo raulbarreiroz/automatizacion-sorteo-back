@@ -4,7 +4,7 @@ require("dotenv").config();
 const deploy = true;
 
 const config = {
-  connectionString: DATABASE_URL,
+  connectionString: process.env.DATABASE_URL,
 };
 
 if (!deploy) {
