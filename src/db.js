@@ -4,12 +4,10 @@ require("dotenv").config();
 const deploy = true;
 
 const config = {
-  connectionString: deploy
-    ? process.env.EXTERNAL_DATABASE_URL
-    : process.env.INTERNAL_DATABASE_URL,
+  connectionString: DATABASE_URL,
 };
 
-if (deploy) {
+if (!deploy) {
   config["ssl"] = true;
 }
 
