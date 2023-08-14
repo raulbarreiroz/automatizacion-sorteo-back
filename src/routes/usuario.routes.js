@@ -8,8 +8,6 @@ const {
 } = require("../controllers/usuario.controller");
 const { route } = require("./catalogo.routes");
 
-console.log("hola");
-
 const router = Router();
 
 router.get("/usuarios", getUsuarios);

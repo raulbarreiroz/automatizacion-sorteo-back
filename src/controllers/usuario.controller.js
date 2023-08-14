@@ -28,7 +28,6 @@ const createUsuario = async (req, res, next) => {
       console.log(users.rows);
 
       if (users.rows.length > 0) {
-        console.log("hola");
         return res.json({
           detail: "El email que desea registrar ya se encuentra en uso",
         });

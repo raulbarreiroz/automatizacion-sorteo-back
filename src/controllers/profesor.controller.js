@@ -22,10 +22,9 @@ const createProfesor = async (req, res, next) => {
       nombre2,
       apellido1,
       apellido2,
-      cabecera_id,
-      detalle_id,
-      fecha_creacion,
-      creado_por,
+      cabeceraId,
+      detalleId,
+      creadoPor,
       estado,
     } = req.body;
 
@@ -39,7 +38,6 @@ const createProfesor = async (req, res, next) => {
       console.log(profesores.rows);
 
       if (profesores.rows.length > 0) {
-        console.log("hola");
         return res.json({
           detail: "Ya existe un profesor registrado con la cedula ingresada",
         });
@@ -51,7 +49,7 @@ const createProfesor = async (req, res, next) => {
         `INSERT INTO public.Profesor(
           cedula, nombre1, nombre2, apellido1, apellido2, cabecera_id, detalle_id, fecha_creacion, creado_por, estado)
         VALUES ($1, $2, $3, $4, $5, now(), $6, $7, $8, $9, $10);`,
-        [email, hashedPassword, alias, cabecera_id, creado_por, "A", detalle_id]
+        [cedula, nombre1, nombre2, apellido1, apellido2]
       );
 
       res.json(nuevoProfesor);

@@ -33,14 +33,14 @@ WHERE cabecera.estado='A'`);
 
 // create catalogo_cabecera
 const createCatalogoCabecera = async (req, res, next) => {
-  const { nombre, descripcion, creado_por } = req.body;
+  const { nombre, descripcion, creadoPor } = req.body;
 
   try {
     const catalogoCabecera = await pool.query(
       `INSERT INTO public.catalogo_cabecera(
       nombre, descripcion, creado_por, fecha_creacion, estado)
       VALUES ($1, $2, $3, NOW(), 'A');`,
-      [nombre, descripcion, creado_por]
+      [nombre, descripcion, creadoPor]
     );
     res.json(catalogoCabecera);
   } catch (err) {
@@ -50,14 +50,13 @@ const createCatalogoCabecera = async (req, res, next) => {
 
 // create catalogo_detalle
 const createCatalogoDetalle = async (req, res, next) => {
-  const { nombre, descripcion, creado_por, cabecera } = req.body;
-
+  const { nombre, descripcion, creadoPor, cabeceraId } = req.body;
   try {
     const catalogoDetalle = await pool.query(
       `INSERT INTO public.catalogo_detalle(
-      nombre, descripcion, creado_por, fecha_creacion, cabecera, estado)
+      nombre, descripcion, creado_por, fecha_creacion, cabecera_id, estado)
       VALUES ($1, $2, $3, NOW(), $4, 'A');`,
-      [nombre, descripcion, creado_por, cabecera]
+      [nombre, descripcion, creadoPor, cabeceraId]
     );
     res.json(catalogoDetalle);
   } catch (err) {
@@ -68,17 +67,14 @@ const createCatalogoDetalle = async (req, res, next) => {
 // update catalogo_cabecera
 const updateCatalogoCabecera = async (req, res, next) => {
   const { id } = req.params;
-  const { nombre, descripcion, modificado_por } = req.body;
-
-  console.log("id: ");
-  console.log(id);
+  const { nombre, descripcion, modificadoPor } = req.body;
 
   try {
     const text = `
     UPDATE public.catalogo_cabecera SET 
       nombre = '${nombre}', 
       descripcion = '${descripcion}',
-      modificado_por = array_append(modificado_por, '${modificado_por}'),
+      modificado_por = array_append(modificado_por, '${modificadoPor}'),
       fecha_modificacion = array_append(fecha_modificacion, NOW()),
       estado = '${estado}'
     WHERE id in (${id})`;
@@ -96,23 +92,17 @@ const updateCatalogoCabecera = async (req, res, next) => {
 // update catalogo_detalle
 const updateCatalogoDetalle = async (req, res, next) => {
   const { id } = req.params;
-  const { nombre, descripcion, modificado_por, estado } = req.body;
-  console.log("id: ");
-  console.log(id);
+  const { nombre, descripcion, estado } = req.body;
 
   try {
     const newValues = {
       nombre,
       descripcion,
-      modificado_por,
     };
     const text = `
     UPDATE public.catalogo_detalle SET 
       nombre = '${nombre}', 
-      descripcion = '${descripcion}',
-      modificado_por = array_append(modificado_por, '${modificado_por}'),
-      fecha_modificacion = array_append(fecha_modificacion, NOW()),
-      estado = '${estado}'
+      descripcion = '${descripcion}'
     WHERE id in (${id})`;
 
     const query = { text };
