@@ -1,5 +1,4 @@
 const pool = require("../db");
-const bcrypt = require("bcrypt");
 
 // get de todos los Profesors
 const getProfesores = async (req, res, next) => {
@@ -25,17 +24,13 @@ const createProfesor = async (req, res, next) => {
       cabeceraId,
       detalleId,
       creadoPor,
-      estado,
     } = req.body;
 
     try {
       const profesores = await pool.query(
-        "SELECT * FROM public.Profesor WHERE cedula = $1",
+        "SELECT * FROM public.Profesor WHERE cedula = $1 and estado='A'",
         [cedula]
       );
-
-      console.log("profesores.rows:");
-      console.log(profesores.rows);
 
       if (profesores.rows.length > 0) {
         return res.json({
@@ -43,13 +38,20 @@ const createProfesor = async (req, res, next) => {
         });
       }
 
-      console.log("chao");
-
       const nuevoProfesor = await pool.query(
         `INSERT INTO public.Profesor(
           cedula, nombre1, nombre2, apellido1, apellido2, cabecera_id, detalle_id, fecha_creacion, creado_por, estado)
-        VALUES ($1, $2, $3, $4, $5, now(), $6, $7, $8, $9, $10);`,
-        [cedula, nombre1, nombre2, apellido1, apellido2]
+        VALUES ($1, $2, $3, $4, $5, $6, $7, now(), $8, 'A');`,
+        [
+          cedula,
+          nombre1,
+          nombre2,
+          apellido1,
+          apellido2,
+          cabeceraId,
+          detalleId,
+          creadoPor,
+        ]
       );
 
       res.json(nuevoProfesor);
@@ -64,32 +66,18 @@ const createProfesor = async (req, res, next) => {
 // update catalogo_cabecera
 const updateProfesor = async (req, res, next) => {
   const { id } = req.params;
-  const {
-    email,
-    pwd,
-    alias,
-    cabecera_id,
-    detalle_id,
-    creado_por,
-    estado,
-    modificado_por,
-  } = req.body;
-
-  const salt = bcrypt.genSaltSync(10);
-  const hashedPassword = bcrypt.hashSync(pwd, salt);
+  const { cedula, nombre1, nombre2, apellido1, apellido2, detalleId } =
+    req.body;
 
   try {
     const text = `
     UPDATE public.Profesor SET 
-      email='${email}',
-      hashed_pwd='${hashedPassword}',
-      alias='${alias}',
-      cabecera_id='${cabecera_id}', 
-      creado_por='${creado_por}', 
-      modificado_por = array_append(modificado_por, '${modificado_por}'),
-      fecha_modificacion = array_append(fecha_modificacion, NOW()),
-      estado='${estado}',
-      detalle_id='${detalle_id}'
+      cedula='${cedula}',
+      nombre1='${nombre1}',
+      nombre2='${nombre2}',
+      apellido1='${apellido1}',
+      apellido2='${apellido2}',  
+      detalle_id=${detalleId}      
     WHERE id in (${id})`;
 
     const query = { text };
@@ -104,8 +92,6 @@ const updateProfesor = async (req, res, next) => {
 
 const deleteProfesor = async (req, res, next) => {
   try {
-    console.log("deleting");
-
     const { id } = req.params;
 
     try {

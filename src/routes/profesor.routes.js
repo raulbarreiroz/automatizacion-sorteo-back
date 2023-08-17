@@ -1,23 +1,20 @@
 const { Router } = require("express");
 const pool = require("../db");
 const {
-  getUsuarios,
-  createUsuario,
-  updateUsuario,
-  deleteUsuario,
-} = require("../controllers/usuario.controller");
-const { route } = require("./catalogo.routes");
-
-console.log("hola");
+  getProfesores,
+  createProfesor,
+  updateProfesor,
+  deleteProfesor,
+} = require("../controllers/profesor.controller");
 
 const router = Router();
 
-router.get("/usuarios", getUsuarios);
+router.get("/profesores", getProfesores);
 
-router.post("/usuario", createUsuario);
+router.post("/profesor", createProfesor);
 
-router.put("/usuario/:id", updateUsuario);
+router.put("/profesor/:id", updateProfesor);
 
-router.delete("/usuario/:id", deleteUsuario);
+router.delete("/profesor/:id", deleteProfesor);
 
 module.exports = router;

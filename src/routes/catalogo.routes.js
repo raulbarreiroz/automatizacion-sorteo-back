@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const {
   getCatalogos,
+  getCatalogo,
   createCatalogoCabecera,
   createCatalogoDetalle,
   updateCatalogoCabecera,
@@ -12,6 +13,8 @@ const {
 const router = Router();
 
 router.get("/catalogos", getCatalogos);
+
+router.get("/catalogo/:id", getCatalogo);
 
 router.post("/catalogo_cabecera", createCatalogoCabecera);
 

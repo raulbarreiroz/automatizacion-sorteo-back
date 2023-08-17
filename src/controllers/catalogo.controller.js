@@ -31,6 +31,38 @@ WHERE cabecera.estado='A'`);
   }
 };
 
+// get de catalogopor id con sus detalles
+const getCatalogo = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const catalogo = await pool.query(`select 
+cabecera.*,
+(
+  select json_agg(
+    json_build_object(
+      'id', id, 
+      'nombre',nombre, 
+      'descripcion',descripcion, 
+      'creado_por',creado_por, 
+      'fecha_creacion',fecha_creacion, 
+      'modificado_por',modificado_por, 
+      'fecha_modificacion',fecha_modificacion, 
+      'cabecera_id',cabecera_id,
+      'estado', estado
+    ) 
+  ) as detalles
+  from catalogo_detalle detalle
+  where detalle.cabecera_id = cabecera.id
+    and detalle.estado = 'A'
+)
+from catalogo_cabecera cabecera
+WHERE id = ${id} AND cabecera.estado='A'`);
+    return res.json(catalogo.rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // create catalogo_cabecera
 const createCatalogoCabecera = async (req, res, next) => {
   const { nombre, descripcion, creadoPor } = req.body;
@@ -155,6 +187,7 @@ const deleteCatalogoDetalle = async (req, res, next) => {
 
 module.exports = {
   getCatalogos,
+  getCatalogo,
   createCatalogoCabecera,
   createCatalogoDetalle,
   updateCatalogoCabecera,
