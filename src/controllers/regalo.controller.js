@@ -1,6 +1,8 @@
 // si bien la tabla de regalos es un poco básico se podría categorizar o estandarizar
 // conla ayuda de la tabla catalogo
 
+// falta arreglar el tema de imagenes
+
 const pool = require("../db");
 
 // get de todos los Profesors
@@ -21,9 +23,9 @@ const createRegalo = async (req, res, next) => {
 
     try {
       const nuevoRegalo = await pool.query(
-        `INSERT INTO regalo (nombre, imagen, auspiciante, creado_por, fecha_creacion, estado)
-        VALUES ($1, $2, $3, $4, now(), 'A');`,
-        [nombre, imagen, auspiciante, creadoPor]
+        `INSERT INTO regalo (nombre, auspiciante, creado_por, fecha_creacion, estado)
+        VALUES ($1, $2, $3, now(), 'A');`,
+        [nombre, auspiciante, creadoPor]
       );
 
       res.json(nuevoRegalo);
