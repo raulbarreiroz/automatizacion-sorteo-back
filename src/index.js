@@ -8,7 +8,8 @@ const testRoutes = require("./routes/test.routes");
 const usuarioRoutes = require("./routes/usuario.routes");
 const catalogoRoutes = require("./routes/catalogo.routes");
 const profesorRoutes = require("./routes/profesor.routes");
-const regaloRoutes = require('./routes/regalo.routes')
+const regaloRoutes = require("./routes/regalo.routes");
+const sorteoRoutes = require("./routes/sorteo.routes");
 
 const PORT = process.env.PORT ?? 8000;
 const app = express();
@@ -23,7 +24,8 @@ app.use(testRoutes);
 app.use(usuarioRoutes);
 app.use(catalogoRoutes);
 app.use(profesorRoutes);
-app.use(regaloRoutes)
+app.use(regaloRoutes);
+app.use(sorteoRoutes);
 
 app.use((err, req, res, next) => {
   return res.json({

@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const getUsuarios = async (req, res, next) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM usuario WHERE estado in ('A')"
+      "SELECT alias, cabecera_id, creado_por, detalle_id, email, estado, fecha_creacion, fecha_modificacion, id, modificado_por FROM public.usuario WHERE estado in ('A')"
     );
     return res.json(result.rows);
   } catch (err) {
@@ -16,7 +16,7 @@ const getUsuarios = async (req, res, next) => {
 // create usuario
 const createUsuario = async (req, res, next) => {
   try {
-    const { email, pwd, alias, cabecera_id, detalle_id, creado_por } = req.body;
+    const { email, pwd, alias, cabeceraId, detalleId, creadoPor } = req.body;
 
     try {
       const users = await pool.query(
@@ -42,7 +42,7 @@ const createUsuario = async (req, res, next) => {
         `INSERT INTO public.usuario(
           email, hashed_pwd, alias, cabecera_id, creado_por, fecha_creacion, estado, detalle_id)
         VALUES ($1, $2, $3, $4, $5, now(), $6, $7);`,
-        [email, hashedPassword, alias, cabecera_id, creado_por, "A", detalle_id]
+        [email, hashedPassword, alias, cabeceraId, creadoPor, "A", detalleId]
       );
 
       res.json(nuevoUsuario);
@@ -57,32 +57,23 @@ const createUsuario = async (req, res, next) => {
 // update catalogo_cabecera
 const updateUsuario = async (req, res, next) => {
   const { id } = req.params;
-  const {
-    email,
-    pwd,
-    alias,
-    cabecera_id,
-    detalle_id,
-    creado_por,
-    estado,
-    modificado_por,
-  } = req.body;
+  const { email, pwd, alias, cabeceraId, detalleId, modificadoPor } = req.body;
 
-  const salt = bcrypt.genSaltSync(10);
-  const hashedPassword = bcrypt.hashSync(pwd, salt);
+  let hashedPassword = "";
+
+  if (pwd) {
+    const salt = bcrypt.genSaltSync(10);
+    hashedPassword = bcrypt.hashSync(pwd, salt);
+  }
 
   try {
     const text = `
     UPDATE public.usuario SET 
-      email='${email}',
-      hashed_pwd='${hashedPassword}',
-      alias='${alias}',
-      cabecera_id='${cabecera_id}', 
-      creado_por='${creado_por}', 
-      modificado_por = array_append(modificado_por, '${modificado_por}'),
-      fecha_modificacion = array_append(fecha_modificacion, NOW()),
-      estado='${estado}',
-      detalle_id='${detalle_id}'
+      email='${email}'
+      ${hashedPassword !== "" ? ",hashed_pwd: " + hashedPassword : ""}      
+     ,alias='${alias}',
+      cabecera_id='${cabeceraId}',             
+      detalle_id='${detalleId}'
     WHERE id in (${id})`;
 
     const query = { text };
@@ -91,14 +82,12 @@ const updateUsuario = async (req, res, next) => {
 
     res.json(usuarioEditado);
   } catch (err) {
-    next(err);
+    next(err);            
   }
 };
 
 const deleteUsuario = async (req, res, next) => {
-  try {
-    console.log("deleting");
-
+  try {    
     const { id } = req.params;
 
     try {
