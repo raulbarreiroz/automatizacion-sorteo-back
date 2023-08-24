@@ -8,26 +8,35 @@ const pool = require("../db");
 // get de todos los Profesors
 const getRegalos = async (req, res, next) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM regalo WHERE estado in ('A')"
-    );
+    const result = await pool.query(`
+select r.id, r.nombre, r.imagen, r.estado, r.tipo_donacion_id, r.facultad_id, r.nombre_donador,
+	t.nombre as nombre_donacion, t.descripcion
+from regalo r
+left join tipo_donacion t
+	on r.tipo_donacion_id = t.id
+where r.estado = 'A' and t.estado = 'A'
+    `);
     return res.json(result.rows);
   } catch (err) {
     next(err);
   }
 };
 
+// TODO: este CRUD hay que ahacerlo mientras se hace la parte visual
+
 const createRegalo = async (req, res, next) => {
   try {
-    const { nombre, imagen, auspiciante, creadoPor } = req.body;
+    let { nombre, tipoDonacionId, facultadId, nombreDonador } = req.body;
+
+    facultadId = facultadId === "" ? "NULL" : facultadId;
 
     try {
       const nuevoRegalo = await pool.query(
-        `INSERT INTO regalo (nombre, auspiciante, creado_por, fecha_creacion, estado)
-        VALUES ($1, $2, $3, now(), 'A');`,
-        [nombre, auspiciante, creadoPor]
+        `INSERT INTO regalo (nombre, tipo_donacion_id, facultad_id, nombre_donador, estado)
+        VALUES ($1, $2, $3, $4, 'A');`,
+        [nombre, tipoDonacionId, facultadId, nombreDonador]
       );
-
+      console.log(nuevoRegalo);
       res.json(nuevoRegalo);
     } catch (err) {
       console.log(err);
@@ -40,15 +49,23 @@ const createRegalo = async (req, res, next) => {
 // update catalogo_cabecera
 const updateRegalo = async (req, res, next) => {
   const { id } = req.params;
-  const { nombre, imagen, auspiciante } = req.body;
+  let { nombre, imagen, facultadId, tipoDonacionId, nombreDonador } =
+    req.body;
 
+  facultadId = facultadId === "" ? "NULL" : facultadId;
+  
+  console.log(nombre, imagen, facultadId, tipoDonacionId, nombreDonador);
   try {
     const text = `
     UPDATE public.regalo SET 
       nombre='${nombre}',
       imagen=NULL,
-      auspiciante='${auspiciante}'      
+      facultad_id=${facultadId},
+      tipo_donacion_id=${tipoDonacionId},
+      nombre_donador='${nombreDonador}'      
     WHERE id in (${id})`;
+
+    console.log(text);
 
     const query = { text };
 

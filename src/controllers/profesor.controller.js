@@ -15,16 +15,8 @@ const getProfesores = async (req, res, next) => {
 // create Profesor
 const createProfesor = async (req, res, next) => {
   try {
-    const {
-      cedula,
-      nombre1,
-      nombre2,
-      apellido1,
-      apellido2,
-      cabeceraId,
-      detalleId,
-      creadoPor,
-    } = req.body;
+    const { cedula, nombre1, nombre2, apellido1, apellido2, facultadId } =
+      req.body;
 
     try {
       const profesores = await pool.query(
@@ -40,18 +32,9 @@ const createProfesor = async (req, res, next) => {
 
       const nuevoProfesor = await pool.query(
         `INSERT INTO public.Profesor(
-          cedula, nombre1, nombre2, apellido1, apellido2, cabecera_id, detalle_id, fecha_creacion, creado_por, estado)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, now(), $8, 'A');`,
-        [
-          cedula,
-          nombre1,
-          nombre2,
-          apellido1,
-          apellido2,
-          cabeceraId,
-          detalleId,
-          creadoPor,
-        ]
+          cedula, nombre1, nombre2, apellido1, apellido2, facultad_id , estado)
+        VALUES ($1, $2, $3, $4, $5, $6, 'A');`,
+        [cedula, nombre1, nombre2, apellido1, apellido2, facultadId]
       );
 
       res.json(nuevoProfesor);
@@ -66,7 +49,7 @@ const createProfesor = async (req, res, next) => {
 // update catalogo_cabecera
 const updateProfesor = async (req, res, next) => {
   const { id } = req.params;
-  const { cedula, nombre1, nombre2, apellido1, apellido2, detalleId } =
+  const { cedula, nombre1, nombre2, apellido1, apellido2, facultadId } =
     req.body;
 
   try {
@@ -77,7 +60,7 @@ const updateProfesor = async (req, res, next) => {
       nombre2='${nombre2}',
       apellido1='${apellido1}',
       apellido2='${apellido2}',  
-      detalle_id=${detalleId}      
+      facultad_id=${facultadId}
     WHERE id in (${id})`;
 
     const query = { text };
