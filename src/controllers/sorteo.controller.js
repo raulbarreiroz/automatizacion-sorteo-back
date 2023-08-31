@@ -2,51 +2,74 @@ const pool = require("../db");
 // get de todos los sorteos
 const getSorteos = async (req, res, next) => {
   try {
+    const { tipo_donacion_id } = req.params;
+
     const sorteos = [];
-    const result = await pool.query(
-      "SELECT * FROM public.sorteo WHERE estado in ('A')"
-    );
-    if (result?.rows) {
-      for (r of result?.rows) {
-        console.log(r);
-        let profesores = [];
-        let regalos = [];
+    const result = await pool.query(`
+    select 
+    f.id,
+    f.nombre,
+    f.director_nombre,
+    f.asociacion,
+    f.color,
+    f.logo,
+    f.estado,
+    (
+      select json_agg(
+      json_build_object(
+        'id', id, 
+        'nombre1',nombre1, 
+        'nombre2',nombre2,
+        'apellido1',apellido1,
+        'apellido2',apellido2,
+        'cedula',cedula,
+        'nombre_completo',nombre1 || ' ' || nombre2 || ' ' || apellido1 || ' ' || apellido2
+      ) 
+      ) as profesores
+      from profesor p
+      where f.id = p.facultad_id and p.estado = 'A'    
+    ),
+    (
+      select json_agg(
+      json_build_object(
+        'id', r.id, 
+        'nombre',r.nombre, 
+        'imagen',r.imagen,
+        'tipo_donacion_id',tipo_donacion_id,
+        'nombre_donador',nombre_donador		
+      ) 
+      ) as regalos_asociacion
+       from regalo r
+      left join tipo_donacion t
+        on r.tipo_donacion_id = t.id
+      where r.estado = 'A' and t.estado = 'A' 
+        and r.facultad_id = f.id
+        and r.tipo_donacion_id = 2
+        and r.sorteado = 'N'
+    ),
+    (
+      select json_agg(
+      json_build_object(
+        'id', r.id, 
+        'nombre',r.nombre, 
+        'imagen',r.imagen,
+        'tipo_donacion_id',tipo_donacion_id,
+        'nombre_donador',nombre_donador		
+      ) 
+      ) as regalos_directores
+       from regalo r
+      left join tipo_donacion t
+        on r.tipo_donacion_id = t.id
+      where r.estado = 'A' and t.estado = 'A' 
+        and r.facultad_id = f.id
+        and r.tipo_donacion_id = 1
+        and r.sorteado = 'N'
+    )
+  from facultad f
+  where f.estado = 'A'
+    `);
 
-        if (r) {
-          console.log(r);
-          let profesores = [];
-          let regalos = [];
-
-          if (r) {
-            console.log(r);
-            // conseguir profesores para sorteo
-            if (r?.lista_profesores) {
-              const profesoresQuery = { text: r?.lista_profesores };
-              const profesoresQueryResult = await pool.query(profesoresQuery);
-              if (profesoresQueryResult?.rows)
-                profesores = profesoresQueryResult?.rows;
-            }
-
-            // conseguir regalos para sorteo
-            if (r?.lista_regalos) {
-              const regalosQuery = { text: r?.lista_regalos };
-              const regalosQueryResult = await pool.query(regalosQuery);
-              if (regalosQueryResult?.rows) regalos = regalosQueryResult?.rows;
-            }
-          }
-
-          sorteos.push({
-            id: r.id,
-            nombre: r.nombre,
-            creado_por: r?.creado_por,
-            fecha_creacion: r?.fecha_creacion,
-            profesores: profesores,
-            regalos: regalos,
-          });
-        }
-      }
-    }
-    res.json(sorteos);
+    return res.json(result.rows);
   } catch (err) {
     next(err);
   }

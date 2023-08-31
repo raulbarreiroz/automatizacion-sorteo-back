@@ -10,7 +10,7 @@ const getRegalos = async (req, res, next) => {
   try {
     const result = await pool.query(`
 select r.id, r.nombre, r.imagen, r.estado, r.tipo_donacion_id, r.facultad_id, r.nombre_donador,
-	t.nombre as nombre_donacion, t.descripcion
+	t.nombre as nombre_donacion, t.descripcion, profesor_id
 from regalo r
 left join tipo_donacion t
 	on r.tipo_donacion_id = t.id
@@ -22,19 +22,36 @@ where r.estado = 'A' and t.estado = 'A'
   }
 };
 
+const getRegalosNoSorteados = async (req, res, next) => {
+  try {
+    const result = await pool.query(`
+select r.id, r.nombre, r.imagen, r.estado, r.tipo_donacion_id, r.facultad_id, r.nombre_donador,
+	t.nombre as nombre_donacion, t.descripcion, profesor_id
+from regalo r
+left join tipo_donacion t
+	on r.tipo_donacion_id = t.id
+where r.estado = 'A' and t.estado = 'A' and r.profesor_id is null
+    `);
+    return res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // TODO: este CRUD hay que ahacerlo mientras se hace la parte visual
 
 const createRegalo = async (req, res, next) => {
   try {
-    let { nombre, tipoDonacionId, facultadId, nombreDonador } = req.body;
+    let { nombre, tipoDonacionId, facultadId, nombreDonador, imagen } =
+      req.body;
 
     facultadId = facultadId === "" ? "NULL" : facultadId;
 
     try {
       const nuevoRegalo = await pool.query(
-        `INSERT INTO regalo (nombre, tipo_donacion_id, facultad_id, nombre_donador, estado)
-        VALUES ($1, $2, $3, $4, 'A');`,
-        [nombre, tipoDonacionId, facultadId, nombreDonador]
+        `INSERT INTO regalo (nombre, tipo_donacion_id, facultad_id, nombre_donador, estado, imagen)
+        VALUES ($1, $2, $3, $4, 'A', $5);`,
+        [nombre, tipoDonacionId, facultadId, nombreDonador, imagen]
       );
       console.log(nuevoRegalo);
       res.json(nuevoRegalo);
@@ -49,17 +66,18 @@ const createRegalo = async (req, res, next) => {
 // update catalogo_cabecera
 const updateRegalo = async (req, res, next) => {
   const { id } = req.params;
-  let { nombre, imagen, facultadId, tipoDonacionId, nombreDonador } =
-    req.body;
+  let { nombre, imagen, facultadId, tipoDonacionId, nombreDonador } = req.body;
+
+  console.log(nombre, imagen, facultadId, tipoDonacionId, nombreDonador);
 
   facultadId = facultadId === "" ? "NULL" : facultadId;
-  
+
   console.log(nombre, imagen, facultadId, tipoDonacionId, nombreDonador);
   try {
     const text = `
     UPDATE public.regalo SET 
       nombre='${nombre}',
-      imagen=NULL,
+      imagen='imagen',
       facultad_id=${facultadId},
       tipo_donacion_id=${tipoDonacionId},
       nombre_donador='${nombreDonador}'      
@@ -72,6 +90,32 @@ const updateRegalo = async (req, res, next) => {
     const RegaloEditado = await pool.query(query);
 
     res.json(RegaloEditado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const asignarProfesor = async (req, res, next) => {
+  const { id } = req.params;
+  const { profesorId } = req.body;
+  console.log(id);
+  console.log("asignarProfesor");
+
+  try {
+    const text = `
+    UPDATE public.regalo SET       
+      profesor_id=${profesorId}
+    WHERE id in (${id})`;
+
+    console.log(text);
+
+    const query = { text };
+
+    const ProfesorEditado = await pool.query(query);
+
+    console.log(ProfesorEditado);
+
+    res.json(ProfesorEditado);
   } catch (err) {
     next(err);
   }
@@ -105,4 +149,6 @@ module.exports = {
   createRegalo,
   updateRegalo,
   deleteRegalo,
+  getRegalosNoSorteados,
+  asignarProfesor,
 };
