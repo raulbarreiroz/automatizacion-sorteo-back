@@ -121,28 +121,30 @@ const updateFacultad = async (req, res, next) => {
   const { id } = req.params;
   const { nombre, decanoNombre, decanoFacultadId, color, logo } = req.body;
 
+  console.log(nombre, decanoNombre, decanoFacultadId, color, logo);
+
   try {
-    const text = `
+    let text = `
     UPDATE public.FACULTAD SET       
       nombre='${nombre}',      
       color='${color}',
-      logo='${logo}',        
-    WHERE cedula in ('${cedula}')`;
+      logo='${logo}'       
+    WHERE id in (${id})`;
 
-    const query = { text };
+    let query = { text };
     const ProfesorEditado = await pool.query(query);
 
     console.log(ProfesorEditado);
 
-    const text2 = `
+    text = `
     UPDATE public.DECANO SET       
-      nombre='${decanoNombre}',               
-    WHERE id in ('${decanoFacultadId}')`;
+      nombre='${decanoNombre}'               
+    WHERE id in (${decanoFacultadId})`;
 
-    const query2 = { text2 };
+    query = { text };
     const DecanoEditado = await pool.query(query);
 
-    res.json(ProfesorEditado);
+    res.json({ ProfesorEditado, DecanoEditado });
   } catch (err) {
     next(err);
   }
@@ -156,16 +158,16 @@ const deleteFacultad = async (req, res, next) => {
       const text = `
     UPDATE public.FACULTAD SET 
       estado = 'I'
-    WHERE id in ('${id}')`;
+    WHERE id in (${id})`;
 
       const query = { text };
 
       const FacultadEliminado = await pool.query(query);
 
       console.log("hola");
-      console.log(FacultadEliminado);
+      console.log();
 
-      res.json(ProfesorEliminado);
+      res.json(FacultadEliminado);
     } catch (err) {
       console.log(err);
     }

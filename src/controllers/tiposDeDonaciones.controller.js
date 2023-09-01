@@ -7,6 +7,7 @@ select
 	t.*				
 from tipo_donacion t
 where t.estado = 'A'
+order by id
     `);
 
     const tipoDeDonaciones = result?.rows;

@@ -7,6 +7,7 @@ const {
   updateRegalo,
   deleteRegalo,
   asignarProfesor,
+  getNombreRegalos,
 } = require("../controllers/regalo.controller");
 
 const router = Router();
@@ -22,5 +23,7 @@ router.put("/regalo/:id", updateRegalo);
 router.put("/asignarProfesor/:id", asignarProfesor);
 
 router.delete("/regalo/:id", deleteRegalo);
+
+router.get("/nombre-regalos", getNombreRegalos);
 
 module.exports = router;

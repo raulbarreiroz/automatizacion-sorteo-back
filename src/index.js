@@ -37,6 +37,7 @@ const carrerasRoutes = require("./routes/carrera.routes");
 const tipoDeDonacionRoutes = require("./routes/tipoDeDonacion.routes");
 const facultadRoutes = require("./routes/facultad.routes");
 const decanoRoutes = require("./routes/decano.routes");
+const directorRoutes = require("./routes/director.routes");
 
 const PORT = process.env.PORT ?? 8000;
 const app = express();
@@ -57,6 +58,7 @@ app.use(facultadRoutes);
 app.use(carrerasRoutes);
 app.use(tipoDeDonacionRoutes);
 app.use(decanoRoutes);
+app.use(directorRoutes);
 
 app.use((err, req, res, next) => {
   return res.json({

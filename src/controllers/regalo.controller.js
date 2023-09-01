@@ -22,6 +22,19 @@ where r.estado = 'A' and t.estado = 'A'
   }
 };
 
+const getNombreRegalos = async (req, res, next) => {
+  try {
+    const result = await pool.query(`
+    select distinct r.nombre, r.tipo_donacion_id
+from regalo r
+where r.estado = 'A'
+    `);
+    return res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getRegalosNoSorteados = async (req, res, next) => {
   try {
     const result = await pool.query(`
@@ -41,6 +54,7 @@ where r.estado = 'A' and t.estado = 'A' and r.profesor_id is null
 // TODO: este CRUD hay que ahacerlo mientras se hace la parte visual
 
 const createRegalo = async (req, res, next) => {
+  console.log("hola");
   try {
     let { nombre, tipoDonacionId, facultadId, nombreDonador, imagen } =
       req.body;
@@ -151,4 +165,5 @@ module.exports = {
   deleteRegalo,
   getRegalosNoSorteados,
   asignarProfesor,
+  getNombreRegalos,
 };
