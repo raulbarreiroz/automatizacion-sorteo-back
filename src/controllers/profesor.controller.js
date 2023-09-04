@@ -110,16 +110,15 @@ const updateProfesor = async (req, res, next) => {
 };
 
 const asignarRegalo = async (req, res, next) => {
-  const { id } = req.params;
-  const { cedula, asignarRegalo } = req.body;
+  const { profesorId, regaloId } = req.body;
 
   console.log("asignarRegalo");
 
   try {
     const text = `
     UPDATE public.Profesor SET       
-      regalo_id=${asignarRegalo}
-    WHERE cedula in ('${cedula}')`;
+      regalo_id=${regaloId}
+    WHERE id in (${profesorId})`;
 
     console.log(text);
 

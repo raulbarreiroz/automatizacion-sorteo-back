@@ -27,7 +27,7 @@ const getNombreRegalos = async (req, res, next) => {
     const result = await pool.query(`
     select distinct r.nombre, r.tipo_donacion_id
 from regalo r
-where r.estado = 'A'
+where r.estado = 'A' and r.profesor_id is null
     `);
     return res.json(result.rows);
   } catch (err) {
@@ -110,16 +110,14 @@ const updateRegalo = async (req, res, next) => {
 };
 
 const asignarProfesor = async (req, res, next) => {
-  const { id } = req.params;
-  const { profesorId } = req.body;
-  console.log(id);
+  const { profesorId, regaloId } = req.body;
   console.log("asignarProfesor");
 
   try {
     const text = `
     UPDATE public.regalo SET       
       profesor_id=${profesorId}
-    WHERE id in (${id})`;
+    WHERE id in (${regaloId})`;
 
     console.log(text);
 

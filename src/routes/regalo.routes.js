@@ -20,7 +20,7 @@ router.post("/regalo", createRegalo);
 
 router.put("/regalo/:id", updateRegalo);
 
-router.put("/asignarProfesor/:id", asignarProfesor);
+router.put("/asignarProfesor", asignarProfesor);
 
 router.delete("/regalo/:id", deleteRegalo);
 

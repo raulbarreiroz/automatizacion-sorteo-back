@@ -190,21 +190,19 @@ const updateUsuario = async (req, res, next) => {
   }
 };
 
-const deleteUsuario = async (req, res, next) => {
+const agregarRegistroBitacora = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { nombreProfesor, nombreRegalo, nombreFacultad } = req.body;
 
     try {
-      const text = `
-    UPDATE public.usuario SET 
-      estado = 'I'
-    WHERE id in (${id})`;
+      const nuevaBitacora = await pool.query(
+        `INSERT INTO public.bitacora(
+          nombre_profesor, nombre_regalo, nombre_facultad, fecha, estado)
+        VALUES($1, $2, $3, now(), 'A');`,
+        [nombreProfesor, nombreRegalo, nombreFacultad]
+      );
 
-      const query = { text };
-
-      const usuarioEliminado = await pool.query(query);
-
-      res.json(usuarioEliminado);
+      res.json(nuevaBitacora);
     } catch (err) {
       console.log(err);
     }
@@ -213,7 +211,25 @@ const deleteUsuario = async (req, res, next) => {
   }
 };
 
+const getBitacora = async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `
+SELECT  
+  *
+FROM bitacora WHERE estado in ('A')
+order by fecha asc
+`
+    );
+    return res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getSorteos,
   getSorteo,
+  agregarRegistroBitacora,
+  getBitacora,
 };

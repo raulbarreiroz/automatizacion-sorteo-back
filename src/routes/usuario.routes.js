@@ -5,6 +5,8 @@ const {
   createUsuario,
   updateUsuario,
   deleteUsuario,
+  inciarSesion,
+  createGestor,
 } = require("../controllers/usuario.controller");
 const { route } = require("./catalogo.routes");
 
@@ -14,8 +16,12 @@ router.get("/usuarios", getUsuarios);
 
 router.post("/usuario", createUsuario);
 
+router.post("/gestor", createGestor);
+
 router.put("/usuario/:id", updateUsuario);
 
 router.delete("/usuario/:id", deleteUsuario);
+
+router.post("/iniciar-sesion", inciarSesion);
 
 module.exports = router;
