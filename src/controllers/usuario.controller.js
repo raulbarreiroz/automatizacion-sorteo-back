@@ -17,7 +17,7 @@ const getUsuarios = async (req, res, next) => {
 // create usuario
 const createUsuario = async (req, res, next) => {
   try {
-    const { email, pwd, alias, rolId } = req.body;
+    const { email, alias } = req.body;
 
     console.log("creando usuario");
 
@@ -37,7 +37,7 @@ const createUsuario = async (req, res, next) => {
       }
 
       const salt = bcrypt.genSaltSync(10);
-      const hashedPassword = bcrypt.hashSync(pwd, salt);
+      const hashedPassword = bcrypt.hashSync("test", salt);
 
       console.log("salt");
       console.log(salt);
@@ -47,24 +47,13 @@ const createUsuario = async (req, res, next) => {
       const nuevoUsuario = await pool.query(
         `INSERT INTO public.usuario(
           email, hashed_pwd, alias, estado, rol_id)
-        VALUES ($1, $2, $3,'A', $4);`,
+        VALUES ($1, $2, $3,'A', 4);`,
         [email, hashedPassword, alias, rolId]
       );
 
       if (success) {
-        console.log("pwd correcot");
-        const token = jwt.sign({ email }, "secret", { expiresIn: "10s" });
-        res.json({
-          severity: "success",
-          message: `Bienvenido ${aliasEncontrado}`,
-          alias,
-          rolId: 2,
-          email,
-          token,
-          expires: "10s",
-        });
+        res.json(nuevoUsuario);
       } else {
-        console.log("contrasena incorrecta");
         res.json({
           severity: "error",
           message: "Problema al crear usuario",
@@ -80,7 +69,7 @@ const createUsuario = async (req, res, next) => {
 
 const createGestor = async (req, res, next) => {
   try {
-    const { email, pwd, alias, rolId } = req.body;
+    const { email, alias } = req.body;
 
     console.log("creando usuario");
 
@@ -100,7 +89,7 @@ const createGestor = async (req, res, next) => {
       }
 
       const salt = bcrypt.genSaltSync(10);
-      const hashedPassword = bcrypt.hashSync(pwd, salt);
+      const hashedPassword = bcrypt.hashSync("test", salt);
 
       console.log("salt");
       console.log(salt);
@@ -109,9 +98,9 @@ const createGestor = async (req, res, next) => {
 
       const nuevoUsuario = await pool.query(
         `INSERT INTO public.usuario(
-          email, hashed_pwd, alias, estado, rol_id)
-        VALUES ($1, $2, $3,'A', $4);`,
-        [email, hashedPassword, alias, rolId]
+          email, alias, hashed_pwd, estado, rol_id)
+        VALUES ($1, $2, null, 'A', 4);`,
+        [email, alias]
       );
 
       res.json(nuevoUsuario);
@@ -126,31 +115,57 @@ const createGestor = async (req, res, next) => {
 // update catalogo_cabecera
 const updateUsuario = async (req, res, next) => {
   const { id } = req.params;
-  const { email, pwd, alias, rolId } = req.body;
+  const { email, alias, borrarPwd, actualizarPwd } = req.body;
 
-  let hashedPassword = "";
+  if (borrarPwd) {
+    try {
+      const text = `
+      UPDATE public.usuario SET 
+        hashed_pwd= null    
+      WHERE id in (${id})`;
 
-  if (pwd) {
-    const salt = bcrypt.genSaltSync(10);
-    hashedPassword = bcrypt.hashSync(pwd, salt);
-  }
+      const query = { text };
 
-  try {
-    const text = `
-    UPDATE public.usuario SET 
-      email='${email}'
-      ${hashedPassword !== "" ? ",hashed_pwd: " + hashedPassword : ""}      
-     ,alias='${alias}',
-      rol_id=${rolId}
-    WHERE id in (${id})`;
+      const usuarioEditado = await pool.query(query);
 
-    const query = { text };
+      res.json(usuarioEditado);
+    } catch (err) {
+      next(err);
+    }
+  } else if (actualizarPwd) {
+    try {
+      const salt = bcrypt.genSaltSync(10);
+      const hashedPassword = bcrypt.hashSync(actualizarPwd, salt);
 
-    const usuarioEditado = await pool.query(query);
+      const text = `
+      UPDATE public.usuario SET 
+        hashed_pwd= '${hashedPassword}'  
+      WHERE id in (${id})`;
 
-    res.json(usuarioEditado);
-  } catch (err) {
-    next(err);
+      const query = { text };
+
+      const usuarioEditado = await pool.query(query);
+
+      res.json(usuarioEditado);
+    } catch (err) {
+      next(err);
+    }
+  } else {
+    try {
+      const text = `
+      UPDATE public.usuario SET 
+        email='${email}'      
+      ,alias='${alias}'    
+      WHERE id in (${id})`;
+
+      const query = { text };
+
+      const usuarioEditado = await pool.query(query);
+
+      res.json(usuarioEditado);
+    } catch (err) {
+      next(err);
+    }
   }
 };
 
@@ -209,7 +224,9 @@ const inciarSesion = async (req, res, next) => {
 
         if (success) {
           console.log("pwd correcot");
-          const token = jwt.sign({ email }, "secret", { expiresIn: "10s" });
+          const token = jwt.sign({ email }, "secret", {
+            expiresIn: /*"10800s"*/ "10800s",
+          });
           res.json({
             severity: "success",
             message: `Bienvenido ${aliasEncontrado}`,
@@ -217,7 +234,6 @@ const inciarSesion = async (req, res, next) => {
             rolId,
             email,
             token,
-            expires: "10s",
           });
         } else {
           console.log("contrasena incorrecta");
@@ -236,6 +252,45 @@ const inciarSesion = async (req, res, next) => {
   }
 };
 
+const sesionIniciada = async (req, res, next) => {
+  try {
+    console.log("sesion iniciada?");
+    const { cookies } = req.body;
+    console.log("cookies: ");
+    console.log(cookies);
+    const token = cookies?.TOKEN;
+    console.log("token: ");
+    console.log(token);
+
+    const decoded = jwt.decode(token, { complete: true });
+    const expirationTime = decoded.payload.exp;
+    const expirationDate = new Date(
+      expirationTime * 1000 /* dates in js are in miliseconds */
+    );
+    console.log(expirationDate);
+
+    const now = new Date();
+    console.log(now);
+    if (expirationDate?.getTime() <= now?.getTime()) {
+      //console.log("sesion expirada");
+      res.json({
+        severity: "warning",
+        message: "La sesion para el usuario expiro",
+        sesionIniciada: false,
+      });
+    } else {
+      //console.log("todabia en sesion");
+      res.json({
+        severity: "success",
+        message: "Usuario con sesion activa",
+        sesionIniciada: true,
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getUsuarios,
   createUsuario,
@@ -244,4 +299,5 @@ module.exports = {
   deleteUsuario,
   inciarSesion,
   createGestor,
+  sesionIniciada,
 };

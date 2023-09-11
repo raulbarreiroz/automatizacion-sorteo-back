@@ -91,7 +91,7 @@ const updateProfesor = async (req, res, next) => {
       apellido1='${apellido1}',
       apellido2='${apellido2}',  
       facultad_id=${facultadId},
-      imagen='${imagen}',
+      imagen='${imagen || ""}',
       asistio='${asistio}'
     WHERE cedula in ('${cedula}')`;
 

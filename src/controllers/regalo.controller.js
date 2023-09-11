@@ -80,21 +80,13 @@ const createRegalo = async (req, res, next) => {
 // update catalogo_cabecera
 const updateRegalo = async (req, res, next) => {
   const { id } = req.params;
-  let { nombre, imagen, facultadId, tipoDonacionId, nombreDonador } = req.body;
+  let { nombre, imagen } = req.body;
 
-  console.log(nombre, imagen, facultadId, tipoDonacionId, nombreDonador);
-
-  facultadId = facultadId === "" ? "NULL" : facultadId;
-
-  console.log(nombre, imagen, facultadId, tipoDonacionId, nombreDonador);
   try {
     const text = `
     UPDATE public.regalo SET 
       nombre='${nombre}',
-      imagen='imagen',
-      facultad_id=${facultadId},
-      tipo_donacion_id=${tipoDonacionId},
-      nombre_donador='${nombreDonador}'      
+      imagen='${imagen || ""}'      
     WHERE id in (${id})`;
 
     console.log(text);

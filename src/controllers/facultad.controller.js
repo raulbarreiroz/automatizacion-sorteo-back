@@ -54,7 +54,7 @@ const createFacultad = async (req, res, next) => {
            nombre, estado, color, logo)
         VALUES ($1, 'A', $2, $3 
         );`,
-      [nombre, color, logo]
+      [nombre, color, logo || ""]
     );
 
     const ultimaFAcultadCreada = await pool.query(

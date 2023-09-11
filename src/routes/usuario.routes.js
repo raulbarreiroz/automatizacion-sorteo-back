@@ -7,6 +7,7 @@ const {
   deleteUsuario,
   inciarSesion,
   createGestor,
+  sesionIniciada,
 } = require("../controllers/usuario.controller");
 const { route } = require("./catalogo.routes");
 
@@ -23,5 +24,7 @@ router.put("/usuario/:id", updateUsuario);
 router.delete("/usuario/:id", deleteUsuario);
 
 router.post("/iniciar-sesion", inciarSesion);
+
+router.post("/sesion-iniciada", sesionIniciada);
 
 module.exports = router;
