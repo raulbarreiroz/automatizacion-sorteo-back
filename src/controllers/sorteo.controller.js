@@ -227,9 +227,31 @@ order by fecha asc
   }
 };
 
+const getFechasBitacora = async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `
+      select 
+      date_part('day', fecha) as dia,
+      date_part('month', fecha) as mes,
+      date_part('year', fecha) as anio
+      from bitacora
+      group by 
+      date_part('day', fecha),
+      date_part('month', fecha),
+      date_part('year', fecha)
+`
+    );
+    return res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getSorteos,
   getSorteo,
   agregarRegistroBitacora,
   getBitacora,
+  getFechasBitacora,
 };

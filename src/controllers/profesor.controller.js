@@ -55,6 +55,7 @@ const createProfesor = async (req, res, next) => {
         imagen ? `'${imagen}'` : "null"
       });`;
 
+      console.log("text");
       console.log(text);
 
       const query = { text };

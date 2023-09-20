@@ -225,7 +225,7 @@ const inciarSesion = async (req, res, next) => {
         if (success) {
           console.log("pwd correcot");
           const token = jwt.sign({ email }, "secret", {
-            expiresIn: /*"10800s"*/ "10800s",
+            expiresIn: /*"10800s"*/ "108000s",
           });
           res.json({
             severity: "success",
