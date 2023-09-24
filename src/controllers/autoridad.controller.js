@@ -10,7 +10,6 @@ cabecera.*,
     json_build_object(
       'id', id, 
       'nombre',nombre, 
-      'descripcion',descripcion, 
       'imagen',imagen,
       'institucion_id',institucion_id,
       'estado',estado
@@ -38,8 +37,7 @@ cabecera.*,
   select json_agg(
     json_build_object(
       'id', id, 
-      'nombre',nombre, 
-      'descripcion',descripcion, 
+      'nombre',nombre,       
       'imagen',imagen,
       'institucion_id',institucion_id,
       'estado',estado
@@ -76,14 +74,13 @@ const createAutoridadCabecera = async (req, res, next) => {
 
 // create catalogo_detalle
 const createAutoridadDetalle = async (req, res, next) => {
-  const { nombre, descripcion, imagen, institucionId, autoridadCabeceraId } =
-    req.body;
+  const { nombre, imagen, institucionId, autoridadCabeceraId } = req.body;
   try {
     const autoridadDetalle = await pool.query(
       `INSERT INTO public.autoridad_detalle(
-      nombre, descripcion, imagen, institucion_id, estado, autoridad_cabecera_id)
-      VALUES ($1, $2, $3, $4, 'A', $5);`,
-      [nombre, descripcion, imagen, institucionId, autoridadCabeceraId]
+      nombre, imagen, institucion_id, estado, autoridad_cabecera_id)
+      VALUES ($1, $2, $3, 'A', $4);`,
+      [nombre, imagen, institucionId, autoridadCabeceraId]
     );
     res.json(autoridadDetalle);
   } catch (err) {
@@ -117,18 +114,13 @@ const updateAutoridadCabecera = async (req, res, next) => {
 // update catalogo_detalle
 const updateAutoridadDetalle = async (req, res, next) => {
   const { id } = req.params;
-  const { nombre, descripcion, imagen, institucionId, estado } = req.body;
+  const { nombre, imagen, institucionId, estado } = req.body;
 
   try {
-    const newValues = {
-      nombre,
-      descripcion,
-    };
     const text = `
     UPDATE public.autoridad_detalle SET 
-      nombre = '${nombre}', 
-      descripcion = '${descripcion}',
-      imagen='${imagen}',
+      nombre = '${nombre}',       
+      imagen=${imagen ? "'" + imagen + "'" : "null"},
       institucion_id='${institucionId}',
       estado='${estado}'
     WHERE id in (${id})`;
@@ -171,6 +163,9 @@ const deleteAutoridadDetalle = async (req, res, next) => {
       estado = 'I'
     WHERE id in (${id})`;
 
+    console.log("TEXT MEN");
+    console.log(text);
+
     const query = { text };
 
     const autoridadDetalleEliminado = await pool.query(query);
@@ -184,7 +179,6 @@ const deleteAutoridadDetalle = async (req, res, next) => {
 module.exports = {
   getAutoridades,
   getAutoridad,
-
   createAutoridadCabecera,
   createAutoridadDetalle,
   updateAutoridadCabecera,

@@ -199,11 +199,14 @@ const inciarSesion = async (req, res, next) => {
     console.log("iniciando sesion");
 
     try {
+      console.log("iniciando sesion");
       const users = await pool.query(
         "SELECT * FROM public.usuario WHERE email = $1 and estado = 'A'",
         [email]
       );
 
+      console.log("users: ");
+      console.log(users);
       if (users?.rows?.length === 0) {
         console.log("USUARIO NO EXISTE");
         res.json({
