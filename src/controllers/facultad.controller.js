@@ -3,38 +3,62 @@ const pool = require("../db");
 const getFacultades = async (req, res, next) => {
   try {
     const result = await pool.query(`
-select facultad.*,
-(
-  select json_agg(
-    json_build_object(
-      'id', id, 
-      'nombre',nombre, 
-      'director_id',director_id            
-    ) 
-  ) as carreras
-  from carrera carrera
-  where facultad.id = carrera.facultad_id and carrera.estado = 'A'    
-),
-(
-  select json_agg(
-    json_build_object(
-      	'id', id, 
-      	'nombre1',nombre1, 
-      	'nombre2',nombre2,
-	  	'apellido1',apellido1,
-		'apellido2',apellido2,
-		'cedula',cedula,
-		'nombre_completo',nombre1 || ' ' || nombre2 || ' ' || apellido1 || ' ' || apellido2,
-    'asistio',asistio,
-    'regalo_id',regalo_id,
-    'imagen',imagen
-    ) 
-  ) as profesores
-  from profesor profesor
-  where facultad.id = profesor.facultad_id and profesor.estado = 'A'    
-)
-from facultad facultad
-WHERE facultad.estado='A'    
+    select facultad.*,
+    (
+      select 
+        json_build_object(
+          'id', id, 
+          'nombre', nombre,
+        'descripcion', descripcion,
+        'detalle', (
+          select 
+          json_build_object(
+            'id', id,
+            'nombre', nombre,
+            'imagen', imagen				
+          )       
+          from autoridad_detalle det
+          where det.institucion_id = facultad.id
+          AND det.estado = 'A'    
+          AND det.autoridad_cabecera_id = cab.id
+        )
+        ) 
+        as autoridades
+        FROM AUTORIDAD_CABECERA CAB		
+      WHERE CAB.ID = 1 -- decano   	
+        AND CAB.estado = 'A'    
+    ),
+    (
+      select json_agg(
+        json_build_object(
+          'id', id, 
+          'nombre',nombre, 
+          'director_id',director_id            
+        ) 
+      ) as carreras
+      from carrera carrera
+      where facultad.id = carrera.facultad_id and carrera.estado = 'A'    
+    ),
+    (
+      select json_agg(
+        json_build_object(
+            'id', id, 
+            'nombre1',nombre1, 
+            'nombre2',nombre2,
+          'apellido1',apellido1,
+        'apellido2',apellido2,
+        'cedula',cedula,
+        'nombre_completo',nombre1 || ' ' || nombre2 || ' ' || apellido1 || ' ' || apellido2,
+        'asistio',asistio,
+        'regalo_id',regalo_id,
+        'imagen',imagen
+        ) 
+      ) as profesores
+      from profesor profesor
+      where facultad.id = profesor.facultad_id and profesor.estado = 'A'    
+    )
+    from facultad facultad
+    WHERE facultad.estado='A'    
     `);
 
     const facultades = result?.rows;
